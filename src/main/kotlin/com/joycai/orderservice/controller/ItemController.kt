@@ -6,7 +6,6 @@ import com.joycai.orderservice.repository.CategoryRepository
 import com.joycai.orderservice.repository.ItemImageRepository
 import com.joycai.orderservice.repository.ItemRepository
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.math.BigDecimal
@@ -60,7 +59,6 @@ class ItemController(
     }
 
     @PostMapping("/seller/items")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun createItem(
         @RequestBody body: Map<String, Any>,
         @AuthenticationPrincipal sellerId: String,
@@ -79,7 +77,6 @@ class ItemController(
     }
 
     @PutMapping("/seller/items/{id}")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun updateItem(
         @PathVariable id: Long,
         @RequestBody body: Map<String, Any>,
@@ -100,7 +97,6 @@ class ItemController(
     }
 
     @GetMapping("/seller/items")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun myItems(@AuthenticationPrincipal sellerId: String): ResponseEntity<List<Map<String, Any>>> {
         return ResponseEntity.ok(itemRepository.findBySellerId(sellerId).map { it.toMap() })
     }

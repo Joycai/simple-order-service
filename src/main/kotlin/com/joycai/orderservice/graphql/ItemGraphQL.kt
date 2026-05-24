@@ -4,7 +4,6 @@ import com.joycai.orderservice.model.*
 import com.joycai.orderservice.repository.*
 import com.joycai.orderservice.service.OrderService
 import org.springframework.graphql.data.method.annotation.*
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.stereotype.Controller
 import java.math.BigDecimal
@@ -42,22 +41,18 @@ class ItemGraphQL(
     fun categories(): List<Category> = categoryRepository.findAll()
 
     @QueryMapping
-    @PreAuthorize("hasRole('seller')")
     fun sellerItems(@AuthenticationPrincipal sellerId: String): List<Item> =
         itemRepository.findBySellerId(sellerId)
 
     @QueryMapping
-    @PreAuthorize("hasRole('buyer')")
     fun cart(@AuthenticationPrincipal buyerId: String): List<CartItem> =
         cartItemRepository.findByBuyerId(buyerId)
 
     @QueryMapping
-    @PreAuthorize("hasRole('buyer')")
     fun buyerOrders(@AuthenticationPrincipal buyerId: String): List<Order> =
         orderRepository.findByBuyerId(buyerId)
 
     @QueryMapping
-    @PreAuthorize("hasRole('seller')")
     fun sellerOrders(@AuthenticationPrincipal sellerId: String): List<Order> =
         orderRepository.findBySellerId(sellerId)
 
@@ -67,7 +62,6 @@ class ItemGraphQL(
     // ── Mutations ────────────────────────────────────────────────
 
     @MutationMapping
-    @PreAuthorize("hasRole('seller')")
     fun createItem(@Argument input: Map<String, Any>, @AuthenticationPrincipal sellerId: String): Item {
         return itemRepository.save(Item(
             sellerId = sellerId,
@@ -82,7 +76,6 @@ class ItemGraphQL(
     }
 
     @MutationMapping
-    @PreAuthorize("hasRole('buyer')")
     fun addToCart(@Argument itemId: Long, @Argument quantity: Int, @AuthenticationPrincipal buyerId: String): CartItem {
         val existing = cartItemRepository.findByBuyerIdAndItemId(buyerId, itemId)
         return if (existing != null) {
@@ -93,16 +86,13 @@ class ItemGraphQL(
     }
 
     @MutationMapping
-    @PreAuthorize("hasRole('buyer')")
     fun checkout(@AuthenticationPrincipal buyerId: String): List<Order> = orderService.checkout(buyerId)
 
     @MutationMapping
-    @PreAuthorize("hasRole('seller')")
     fun markPaid(@Argument orderId: Long, @AuthenticationPrincipal sellerId: String): Order =
         orderService.markPaid(orderId, sellerId)
 
     @MutationMapping
-    @PreAuthorize("hasRole('seller')")
     fun ship(@Argument orderId: Long, @Argument trackingNumber: String?, @AuthenticationPrincipal sellerId: String): Shipment =
         orderService.ship(orderId, sellerId, trackingNumber)
 

@@ -4,13 +4,11 @@ import com.joycai.orderservice.model.CartItem
 import com.joycai.orderservice.repository.CartItemRepository
 import com.joycai.orderservice.repository.ItemRepository
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/cart")
-@PreAuthorize("hasRole('buyer')")
 class CartController(
     private val cartItemRepository: CartItemRepository,
     private val itemRepository: ItemRepository,

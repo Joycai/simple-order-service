@@ -4,7 +4,6 @@ import com.joycai.orderservice.model.ItemImage
 import com.joycai.orderservice.repository.ItemImageRepository
 import com.joycai.orderservice.repository.ItemRepository
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.security.MessageDigest
@@ -25,7 +24,6 @@ class ItemImageController(
     }
 
     @PostMapping("/seller/items/{itemId}/images")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun uploadImage(
         @PathVariable itemId: Long,
         @RequestBody body: Map<String, Any>,
@@ -52,7 +50,6 @@ class ItemImageController(
     }
 
     @PutMapping("/seller/items/{itemId}/images/reorder")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun reorderImages(
         @PathVariable itemId: Long,
         @RequestBody body: Map<String, Any>,
@@ -74,7 +71,6 @@ class ItemImageController(
     }
 
     @DeleteMapping("/seller/item-images/{id}")
-    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun deleteImage(@PathVariable id: Long, @AuthenticationPrincipal sellerId: String): ResponseEntity<Map<String, String>> {
         val img = itemImageRepository.findById(id).orElse(null)
             ?: return ResponseEntity.notFound().build()

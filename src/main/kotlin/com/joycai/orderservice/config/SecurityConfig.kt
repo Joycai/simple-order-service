@@ -3,7 +3,7 @@ package com.joycai.orderservice.config
 import com.joycai.iam.client.autoconfigure.IamJwtAuthFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
+import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
@@ -15,7 +15,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity
 class SecurityConfig(
     private val jwtFilter: IamJwtAuthFilter,
 ) {
@@ -29,9 +28,14 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/api/v1/items", "/api/v1/items/**").permitAll()
-                    .requestMatchers("/api/v1/categories", "/api/v1/categories/**").permitAll()
                     .requestMatchers("/graphql").permitAll()
+                    // Public read
+                    .requestMatchers(HttpMethod.GET, "/api/v1/items", "/api/v1/items/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/v1/categories", "/api/v1/categories/**").permitAll()
+                    // Seller endpoints
+                    .requestMatchers("/api/v1/seller/**").hasAnyRole("seller", "admin")
+                    // Buyer endpoints
+                    .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**").hasAnyRole("buyer", "admin")
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)

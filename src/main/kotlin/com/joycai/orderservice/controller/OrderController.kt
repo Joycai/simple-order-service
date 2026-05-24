@@ -6,7 +6,6 @@ import com.joycai.orderservice.repository.*
 import com.joycai.orderservice.service.OrderService
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.http.ResponseEntity
-import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 
@@ -24,7 +23,6 @@ class OrderController(
     // ── Buyer ──────────────────────────────────────────────────────
 
     @PostMapping("/orders")
-    @PreAuthorize("hasRole('buyer')")
     fun checkout(@AuthenticationPrincipal buyerId: String): ResponseEntity<Map<String, Any>> {
         return try {
             val orders = orderService.checkout(buyerId)
@@ -37,7 +35,6 @@ class OrderController(
     }
 
     @GetMapping("/orders")
-    @PreAuthorize("hasRole('buyer')")
     fun myOrders(@AuthenticationPrincipal buyerId: String): ResponseEntity<List<Map<String, Any>>> {
         return ResponseEntity.ok(orderRepository.findByBuyerId(buyerId).map { it.toMap() })
     }
@@ -68,7 +65,6 @@ class OrderController(
     }
 
     @PostMapping("/orders/{id}/deliver")
-    @PreAuthorize("hasRole('buyer')")
     fun confirmDelivered(@PathVariable id: Long, @AuthenticationPrincipal buyerId: String): ResponseEntity<Map<String, Any>> {
         return try {
             val shipment = orderService.confirmDelivered(id, buyerId)
@@ -81,13 +77,11 @@ class OrderController(
     // ── Seller ─────────────────────────────────────────────────────
 
     @GetMapping("/seller/orders")
-    @PreAuthorize("hasRole('seller')")
     fun sellerOrders(@AuthenticationPrincipal sellerId: String): ResponseEntity<List<Map<String, Any>>> {
         return ResponseEntity.ok(orderRepository.findBySellerId(sellerId).map { it.toMap() })
     }
 
     @PostMapping("/seller/orders/{id}/pay")
-    @PreAuthorize("hasRole('seller')")
     fun markPaid(@PathVariable id: Long, @AuthenticationPrincipal sellerId: String): ResponseEntity<Map<String, Any>> {
         return try {
             val order = orderService.markPaid(id, sellerId)
@@ -98,7 +92,6 @@ class OrderController(
     }
 
     @PostMapping("/seller/orders/{id}/ship")
-    @PreAuthorize("hasRole('seller')")
     fun ship(
         @PathVariable id: Long,
         @RequestBody body: Map<String, Any>,
