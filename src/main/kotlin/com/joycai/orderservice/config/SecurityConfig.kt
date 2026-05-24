@@ -31,6 +31,7 @@ class SecurityConfig(
                     .requestMatchers("/actuator/**").permitAll()
                     .requestMatchers("/api/v1/items/**").permitAll()
                     .requestMatchers("/api/v1/categories/**").permitAll()
+                    .requestMatchers("/graphql").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
