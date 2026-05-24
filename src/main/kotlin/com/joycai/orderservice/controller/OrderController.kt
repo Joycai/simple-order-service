@@ -46,6 +46,7 @@ class OrderController(
         val items = orderItemRepository.findByOrderId(id).map { oi ->
             val item = itemRepository.findById(oi.itemId).orElse(null)
             mapOf(
+                "id" to oi.id,
                 "itemId" to oi.itemId,
                 "name" to (item?.name ?: ""),
                 "quantity" to oi.quantity,
