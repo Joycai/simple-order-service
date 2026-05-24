@@ -37,4 +37,7 @@ class Order(
 
     @Column(name = "paid_at")
     var paidAt: Instant? = null,
+
+    @Version
+    var version: Long = 0,
 )
