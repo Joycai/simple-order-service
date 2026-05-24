@@ -60,7 +60,7 @@ class ItemController(
     }
 
     @PostMapping("/seller/items")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun createItem(
         @RequestBody body: Map<String, Any>,
         @AuthenticationPrincipal sellerId: String,
@@ -79,7 +79,7 @@ class ItemController(
     }
 
     @PutMapping("/seller/items/{id}")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun updateItem(
         @PathVariable id: Long,
         @RequestBody body: Map<String, Any>,
@@ -100,7 +100,7 @@ class ItemController(
     }
 
     @GetMapping("/seller/items")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun myItems(@AuthenticationPrincipal sellerId: String): ResponseEntity<List<Map<String, Any>>> {
         return ResponseEntity.ok(itemRepository.findBySellerId(sellerId).map { it.toMap() })
     }

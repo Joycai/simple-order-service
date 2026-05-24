@@ -25,7 +25,7 @@ class ItemImageController(
     }
 
     @PostMapping("/seller/items/{itemId}/images")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun uploadImage(
         @PathVariable itemId: Long,
         @RequestBody body: Map<String, Any>,
@@ -52,7 +52,7 @@ class ItemImageController(
     }
 
     @PutMapping("/seller/items/{itemId}/images/reorder")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun reorderImages(
         @PathVariable itemId: Long,
         @RequestBody body: Map<String, Any>,
@@ -74,7 +74,7 @@ class ItemImageController(
     }
 
     @DeleteMapping("/seller/item-images/{id}")
-    @PreAuthorize("hasRole('seller')")
+    @PreAuthorize("hasAnyRole('seller', 'admin')")
     fun deleteImage(@PathVariable id: Long, @AuthenticationPrincipal sellerId: String): ResponseEntity<Map<String, String>> {
         val img = itemImageRepository.findById(id).orElse(null)
             ?: return ResponseEntity.notFound().build()
