@@ -73,5 +73,5 @@ class CartController(
         return ResponseEntity.ok(mapOf("message" to "Removed"))
     }
 
-    private fun bad(msg: String) = ResponseEntity.badRequest().body(mapOf("message" to msg))
+    private fun bad(msg: String): ResponseEntity<Map<String, Any>> = ResponseEntity.badRequest().body(mapOf("message" to msg))
 }

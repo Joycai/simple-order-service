@@ -1,5 +1,6 @@
 package com.joycai.orderservice.controller
 
+import com.joycai.orderservice.model.Order
 import com.joycai.orderservice.model.OrderStatus
 import com.joycai.orderservice.repository.*
 import com.joycai.orderservice.service.OrderService

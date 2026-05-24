@@ -11,7 +11,7 @@ class OrderItem(
     var id: Long = 0,
 
     @Column(name = "order_id", nullable = false)
-    var orderId: Long,
+    var orderId: Long = 0,
 
     @Column(name = "item_id", nullable = false)
     var itemId: Long,
