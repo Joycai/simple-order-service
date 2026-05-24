@@ -3,6 +3,7 @@ package com.joycai.orderservice.config
 import com.joycai.iam.client.autoconfigure.IamJwtAuthFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.core.annotation.Order
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -21,19 +22,32 @@ class SecurityConfig(
 ) {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+    @Order(1)
+    fun publicFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .securityMatcher(
+                "/actuator/**",
+                "/api/v1/items",
+                "/api/v1/items/**",
+                "/api/v1/categories",
+                "/api/v1/categories/**",
+                "/graphql",
+            )
+            .csrf { it.disable() }
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests { it.anyRequest().permitAll() }
+        return http.build()
+    }
+
+    @Bean
+    @Order(2)
+    fun authenticatedFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .cors { it.configurationSource(corsConfigurationSource()) }
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
-            .authorizeHttpRequests { auth ->
-                auth
-                    .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/api/v1/items", "/api/v1/items/**").permitAll()
-                    .requestMatchers("/api/v1/categories", "/api/v1/categories/**").permitAll()
-                    .requestMatchers("/graphql").permitAll()
-                    .anyRequest().authenticated()
-            }
+            .authorizeHttpRequests { it.anyRequest().authenticated() }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
         return http.build()
     }
