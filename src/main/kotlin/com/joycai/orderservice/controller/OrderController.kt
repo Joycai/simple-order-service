@@ -35,8 +35,14 @@ class OrderController(
     }
 
     @GetMapping("/orders")
-    fun myOrders(@AuthenticationPrincipal buyerId: String): ResponseEntity<List<Map<String, Any>>> {
-        return ResponseEntity.ok(orderRepository.findByBuyerId(buyerId).map { it.toMap() })
+    fun myOrders(
+        @AuthenticationPrincipal buyerId: String,
+        @RequestParam(required = false) status: String?,
+        @RequestParam(required = false, defaultValue = "1970-01-01T00:00:00Z") dateFrom: java.time.Instant,
+        @RequestParam(required = false) dateTo: java.time.Instant?,
+    ): ResponseEntity<List<Map<String, Any>>> {
+        val st = status?.let { OrderStatus.valueOf(it.uppercase()) }
+        return ResponseEntity.ok(orderRepository.findByBuyerIdFiltered(buyerId, st, dateFrom, dateTo).map { it.toMap() })
     }
 
     @GetMapping("/orders/{id}")
@@ -78,8 +84,14 @@ class OrderController(
     // ── Seller ─────────────────────────────────────────────────────
 
     @GetMapping("/seller/orders")
-    fun sellerOrders(@AuthenticationPrincipal sellerId: String): ResponseEntity<List<Map<String, Any>>> {
-        return ResponseEntity.ok(orderRepository.findBySellerId(sellerId).map { it.toMap() })
+    fun sellerOrders(
+        @AuthenticationPrincipal sellerId: String,
+        @RequestParam(required = false) status: String?,
+        @RequestParam(required = false, defaultValue = "1970-01-01T00:00:00Z") dateFrom: java.time.Instant,
+        @RequestParam(required = false) dateTo: java.time.Instant?,
+    ): ResponseEntity<List<Map<String, Any>>> {
+        val st = status?.let { OrderStatus.valueOf(it.uppercase()) }
+        return ResponseEntity.ok(orderRepository.findBySellerIdFiltered(sellerId, st, dateFrom, dateTo).map { it.toMap() })
     }
 
     @PostMapping("/seller/orders/{id}/pay")
