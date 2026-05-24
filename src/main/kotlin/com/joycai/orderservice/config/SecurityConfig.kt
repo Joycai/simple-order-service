@@ -29,6 +29,8 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/actuator/**").permitAll()
+                    .requestMatchers("/api/v1/items/**").permitAll()
+                    .requestMatchers("/api/v1/categories/**").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
