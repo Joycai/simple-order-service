@@ -3,7 +3,7 @@ package com.joycai.orderservice.model
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "item_images")
+@Table(name = "item_images", uniqueConstraints = [UniqueConstraint(columnNames = ["item_id", "content_hash"])])
 class ItemImage(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,6 +14,9 @@ class ItemImage(
 
     @Column(nullable = false, columnDefinition = "TEXT")
     var data: String,
+
+    @Column(name = "content_hash", nullable = false, length = 64)
+    var contentHash: String = "",
 
     @Column(name = "sort_order", nullable = false)
     var sortOrder: Int = 0,

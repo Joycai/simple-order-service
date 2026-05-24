@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.security.MessageDigest
 
 @RestController
 @RequestMapping("/api/v1")
@@ -37,8 +38,16 @@ class ItemImageController(
         val data = body["data"] as? String ?: return ResponseEntity.badRequest().body(mapOf("message" to "data required"))
         if (data.length > 1_500_000) return ResponseEntity.badRequest().body(mapOf("message" to "Image too large (max ~1MB base64)"))
 
-        val count = itemImageRepository.findByItemIdOrderBySortOrder(itemId).size
-        val image = itemImageRepository.save(ItemImage(itemId = itemId, data = data, sortOrder = count))
+        val hash = MessageDigest.getInstance("SHA-256").digest(data.toByteArray()).joinToString("") { "%02x".format(it) }
+
+        // Skip if same hash already exists for this item
+        val existing = itemImageRepository.findByItemIdOrderBySortOrder(itemId)
+        if (existing.any { it.contentHash == hash }) {
+            return ResponseEntity.ok(mapOf("id" to existing.first { it.contentHash == hash }.id, "skipped" to true))
+        }
+
+        val count = existing.size
+        val image = itemImageRepository.save(ItemImage(itemId = itemId, data = data, contentHash = hash, sortOrder = count))
         return ResponseEntity.ok(mapOf("id" to image.id, "sortOrder" to image.sortOrder))
     }
 
