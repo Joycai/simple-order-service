@@ -35,7 +35,8 @@ class SecurityConfig(
                     // Seller endpoints
                     .requestMatchers("/api/v1/seller/**").hasAnyRole("seller", "admin")
                     // Buyer endpoints
-                    .requestMatchers("/api/v1/cart/**", "/api/v1/orders/**").hasAnyRole("buyer", "admin")
+                    .requestMatchers("/api/v1/cart/**").hasAnyRole("buyer", "admin")
+                    .requestMatchers("/api/v1/orders/**").hasAnyRole("buyer", "seller", "admin")
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter::class.java)
