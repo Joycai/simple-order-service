@@ -29,8 +29,8 @@ class SecurityConfig(
             .authorizeHttpRequests { auth ->
                 auth
                     .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/api/v1/items/**").permitAll()
-                    .requestMatchers("/api/v1/categories/**").permitAll()
+                    .requestMatchers("/api/v1/items", "/api/v1/items/**").permitAll()
+                    .requestMatchers("/api/v1/categories", "/api/v1/categories/**").permitAll()
                     .requestMatchers("/graphql").permitAll()
                     .anyRequest().authenticated()
             }
