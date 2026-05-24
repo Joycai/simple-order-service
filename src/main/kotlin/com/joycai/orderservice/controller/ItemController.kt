@@ -105,20 +105,27 @@ class ItemController(
         return ResponseEntity.ok(itemRepository.findBySellerId(sellerId).map { it.toMap() })
     }
 
-    private fun Item.toMap() = mapOf(
-        "id" to id,
-        "sellerId" to sellerId,
-        "categoryId" to categoryId,
-        "name" to name,
-        "description" to (description ?: ""),
-        "brand" to (brand ?: ""),
-        "location" to (location ?: ""),
-        "price" to price,
-        "quantity" to quantity,
-        "status" to status.name,
-        "createdAt" to createdAt.toString(),
-        "thumbnail" to (itemImageRepository.findByItemIdOrderBySortOrder(id).firstOrNull()?.data ?: ""),
-    )
+    private fun Item.toMap(): Map<String, Any> {
+        val cat = categoryRepository.findById(categoryId).orElse(null)
+        val catL1 = cat?.parentId?.let { categoryRepository.findById(it).orElse(null) }
+        return mapOf(
+            "id" to id,
+            "sellerId" to sellerId,
+            "categoryId" to categoryId,
+            "categoryName" to (cat?.name ?: ""),
+            "categoryL1Id" to (catL1?.id ?: cat?.id ?: ""),
+            "categoryL1Name" to (catL1?.name ?: cat?.name ?: ""),
+            "name" to name,
+            "description" to (description ?: ""),
+            "brand" to (brand ?: ""),
+            "location" to (location ?: ""),
+            "price" to price,
+            "quantity" to quantity,
+            "status" to status.name,
+            "createdAt" to createdAt.toString(),
+            "thumbnail" to (itemImageRepository.findByItemIdOrderBySortOrder(id).firstOrNull()?.data ?: ""),
+        )
+    }
 
     private fun bad(msg: String): ResponseEntity<Map<String, Any>> = ResponseEntity.badRequest().body(mapOf("message" to msg))
 }
