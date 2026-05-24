@@ -3,6 +3,7 @@ package com.joycai.orderservice.controller
 import com.joycai.orderservice.model.Item
 import com.joycai.orderservice.model.ItemStatus
 import com.joycai.orderservice.repository.CategoryRepository
+import com.joycai.orderservice.repository.ItemImageRepository
 import com.joycai.orderservice.repository.ItemRepository
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
@@ -15,6 +16,7 @@ import java.math.BigDecimal
 class ItemController(
     private val itemRepository: ItemRepository,
     private val categoryRepository: CategoryRepository,
+    private val itemImageRepository: ItemImageRepository,
 ) {
 
     @GetMapping("/categories")
@@ -115,6 +117,7 @@ class ItemController(
         "quantity" to quantity,
         "status" to status.name,
         "createdAt" to createdAt.toString(),
+        "thumbnail" to (itemImageRepository.findByItemIdOrderBySortOrder(id).firstOrNull()?.data ?: ""),
     )
 
     private fun bad(msg: String): ResponseEntity<Map<String, Any>> = ResponseEntity.badRequest().body(mapOf("message" to msg))
